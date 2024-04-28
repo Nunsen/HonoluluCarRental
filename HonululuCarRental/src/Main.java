@@ -7,7 +7,7 @@ public class Main {
         Scanner input = new Scanner(System.in);
         ourMenu(input);
         pickCustomer(input);
-        //options(input);
+        //pickCar(input);
     }
     public static void ourMenu(Scanner input) {
         System.out.println("X****************************************************************X");
@@ -16,26 +16,27 @@ public class Main {
         System.out.println(italic);
         System.out.println("X****************************************************************X");
     }
-
     public static void pickCustomer(Scanner input) throws IOException {
         int answer;
 
         System.out.println("Press 1 for Private Renter\nPress 2 for Company Renter");
         answer = input.nextInt();
 
+        //vælge om det er privat eller company, tilføjer boolean for at tilføje ekstra spørgsmål hvis customerIsCompany
         if (answer == 1) {
-            customerInfo(input);
+            customerInfo(input, false);
         } else if (answer == 2) {
-            customerInfo(input);
-            comCustomer(input);
+            customerInfo(input, true);
         }
     }
-    public static void customerInfo(Scanner input) throws IOException {
+    public static void customerInfo(Scanner input, boolean customerIsCompany) throws IOException {
         System.out.println("Enter Name of Driver");
         String nameDriver = input.next();
+        input.nextLine();
 
         System.out.println("Enter Adress");
-        String address = input.nextLine();
+        String address = input.next();
+        input.nextLine();
         input.nextLine();
 
         System.out.println("Enter zip code");
@@ -54,56 +55,66 @@ public class Main {
         int licenseNr = input.nextInt();
 
         System.out.println("Enter Driver since date (MM-DD-YY");
-        input.nextLine();
         String sinceDate = input.next();
 
-        writeContract(input, nameDriver, address,zip, city, phoneNr, email, licenseNr, sinceDate);
+        //boolean hvis der bliver valgt 2 (dvs. true til at customerIsCompany)
+        if (customerIsCompany){
+            System.out.println("Enter Company Name");
+            String comName = input.next();
+
+            System.out.println("Enter Company Address");
+            String comAddress = input.next();
+
+            System.out.println("Enter Company Phone number");
+            int comPhone = input.nextInt();
+
+            System.out.println("Enter Company Registration Number (6 digits)");
+            int comReg = input.nextInt();
+
+            //hvis det er company skal alle parametre bruges
+            writeContract(input, customerIsCompany, nameDriver, address, zip, city, phoneNr, email, licenseNr, sinceDate,
+                    comName, comAddress, comPhone, comReg);
+        }else {
+            /*Hvis ikke customerIsCompany skal de sidste parametre ikke bruges, derfor anvendes en pladsholder!
+            Man kan ikke slette dem helt, da de stadig findes nede i metoden.*/
+            writeContract(input, customerIsCompany, nameDriver, address, zip, city, phoneNr, email, licenseNr, sinceDate,
+                    "", "", 0, 0);
+        }
     }
-    public static void comCustomer(Scanner input) {
-        System.out.println("Enter Company Name");
-        String comName = input.next();
-
-        System.out.println("Enter Company Address");
-        String comAddress = input.next();
-
-        System.out.println("Enter Company Phone number");
-        int comPhone = input.nextInt();
-
-        System.out.println("Enter Company Registration Number (6 digits)");
-        int comReg = input.nextInt();
-
-        writeContract(input, comName, comAddress, comPhone, comReg);
-    }
-    public static void writeContract(Scanner input, String nameDriver, String address, int zip, String city, int phoneNr, String email, int licenseNr, String sinceDate, String comName, String comAddress, int comPhone, int comReg) throws IOException {
+    public static void writeContract(Scanner input, boolean customerIsCompany, String nameDriver, String address, int zip, String city, int phoneNr, String email, int licenseNr, String sinceDate, String comName, String comAddress, int comPhone, int comReg) throws IOException {
         //anvender localdate til at bruge den aktuelle dato på hvornår kontrakten oprettes
         LocalDate currentDate = LocalDate.now();
 
-        //Vi vil have systemet til at oprette en fil der hedder Contract + dagens dato
+        //Vi vil have systemet til at oprette en fil der hedder Contract + dagens dato, fremfor at vi laver en fil
         String fileName = "Contract_" + currentDate + ".txt";
 
         //Filen oprettes
         FileWriter writer = new FileWriter(fileName);
 
-        // Write some content to the file
+        //følgende informationer skrives ind i filen
         writer.write("This is a new contract created on " + currentDate + "." + "\n");
 
-        writer.write("Name of Driver: " + nameDriver + "\n");
-        writer.write("Address: " + address + "\n");
-        writer.write("Zip code: " + zip + "\n");
-        writer.write("City: "+ city + "\n");
-        writer.write("Phone number: " + phoneNr + "\n");
-        writer.write("E-mail: " + email + "\n");
-        writer.write("Drives License Number: " + licenseNr + "\n");
-        writer.write("Driver since date: " + sinceDate + "\n");
+            writer.write("Name of Driver: " + nameDriver + "\n");
+            writer.write("Address: " + address + "\n");
+            writer.write("Zip code: " + zip + "\n");
+            writer.write("City: " + city + "\n");
+            writer.write("Phone number: " + phoneNr + "\n");
+            writer.write("E-mail: " + email + "\n");
+            writer.write("Drives License Number: " + licenseNr + "\n");
+            writer.write("Driver since date: " + sinceDate + "\n");
 
-        writer.write("Comany Name: " + comName + "\n");
-        writer.write("Company Address: " + comAddress + "\n");
-        writer.write("Company Phone number: " + comPhone + "\n");
-        writer.write("Company Registration Number: "+ comReg + "\n");
-
-        writer.close();
+        /*HVIS der blev valgt at customerIsCompany (hvilket gennem && operator tjekkes ved at tjekke
+         om det første spørgsmål comName.isEmpty, dvs. at det er udfyldt (det er det)
+         --> så printes følgende også over i filen*/
+         if (customerIsCompany && !comName.isEmpty()){
+            writer.write("Comany Name: " + comName + "\n");
+            writer.write("Company Address: " + comAddress + "\n");
+            writer.write("Company Phone number: " + comPhone + "\n");
+            writer.write("Company Registration Number: " + comReg + "\n");
+        }
+         writer.close();
     }
-    public static void options(Scanner input) {
+    public static void pickCar(Scanner input) {
 
         System.out.println("Select car category:\nPress 1 for Family\nPress 2 for Luxery\nPress 3 for Sport\nPress 0 to quit.");
         int answer = input.nextInt();
